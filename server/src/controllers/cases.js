@@ -1,20 +1,17 @@
 const Router = require('express-promise-router')
 
-const { Case, Image } = require('../models')
+const CaseService = require('../services/cases')
 
 const router = new Router()
+const CaseServiceInstance = new CaseService()
 
 router.get('/', async (req, res) => {
-  const cases = await Case.findAll({
-    include: ['images'],
-    order: [['createdAt', 'ASC']]
-  })
+  const cases = await CaseServiceInstance.getAll()
   return res.status(200).json(cases)
 })
 
 router.get('/:id', async (req, res) => {
-  const { id } = req.params
-  const row = await Case.findByPk(id, { include: 'images' })
+  const row = await CaseServiceInstance.getById(req.params.id)
 
   if (row) {
     res.status(200).json(row)
@@ -29,7 +26,7 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: 'Bad Request: Name is required' })
     return
   }
-  const newCase = await Case.create({
+  const newCase = await CaseServiceInstance.create({
     name,
     note
   })
@@ -37,9 +34,7 @@ router.post('/', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
-  const { id } = req.params
-
-  await Case.destroy({ where: { id } })
+  await CaseServiceInstance.removeById(req.params.id)
   return res.status(200).json({ success: true })
 })
 

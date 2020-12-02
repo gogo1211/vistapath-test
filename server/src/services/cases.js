@@ -1,4 +1,5 @@
 const { Case, Image } = require('../models')
+const sleep = require('../utils/sleep')
 
 class CaseService {
   constructor() {}
@@ -8,7 +9,7 @@ class CaseService {
       include: ['images'],
       order: [['createdAt', 'ASC']]
     })
-    await this.sleep(2000)
+    await sleep(2000)
     return cases
   }
 
@@ -75,10 +76,6 @@ class CaseService {
 
   random() {
     return Math.floor(Math.random() * 10) % 3
-  }
-
-  sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }
 

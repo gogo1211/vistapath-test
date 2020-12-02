@@ -4,22 +4,24 @@ import {
   Redirect,
   BrowserRouter as Router
 } from 'react-router-dom'
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-import App from './App'
+import Login from './Login'
+import Cases from './Cases'
 
 export default function Routes() {
   return (
-    <div className="container">
+    <>
       <Router>
         <Switch>
-          <Route exact path="/cases" component={App} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/cases" component={Cases} />
           {/* <Route exact path="/cases/:id" component={CaseDetail} /> */}
-          <Redirect path="/" to="/cases" />
+          <Redirect path="/" to="/login" />
         </Switch>
       </Router>
-      <ToastContainer />
-    </div>
+      <ToastContainer autoClose={3000} />
+    </>
   )
 }

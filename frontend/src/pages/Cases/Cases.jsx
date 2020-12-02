@@ -96,57 +96,64 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1 className="title">Cases</h1>
-      <div className="case-action">
-        <FilterPanel data={filter} onChange={setFilter} />
-        <button
-          className="button is-primary is-small"
-          onClick={handleAddNewCase}
-        >
-          Add New Case
-        </button>
+      <div className="hero">
+        <div className="hero-body">
+          <div className="container">
+            <h1 className="title has-text-white">VistaPath Cases</h1>
+          </div>
+        </div>
       </div>
-
-      <div className="box">
-        <Grid
-          loading={loading}
-          data={{
-            header: [
-              { label: 'ID', key: 'id' },
-              { label: 'Name', key: 'name' },
-              { label: 'Note', key: 'note' },
-              {
-                label: '# of Images',
-                align: 'right',
-                renderer: (row) => row.images.length
-              },
-              {
-                label: 'Created At',
-                align: 'right',
-                renderer: (row) =>
-                  new Date(row.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  })
-              },
-              {
-                label: 'Status',
-                align: 'right',
-                renderer: (row) => <StatusTag status={row.status} />
-              }
-            ],
-            values: filterCases(),
-            actions: [
-              {
-                label: 'Edit',
-                action: handleAction(OPEN_MODE.EDIT),
-                show: (row) => row.status !== CASE_STATUS.APPROVED
-              },
-              { label: 'View', action: handleAction(OPEN_MODE.VIEW) }
-            ]
-          }}
-        />
+      <div className="container">
+        <div className="case-action">
+          <FilterPanel data={filter} onChange={setFilter} />
+          <button
+            className="button is-primary is-small is-light"
+            onClick={handleAddNewCase}
+          >
+            Add New Case
+          </button>
+        </div>
+        <div className="box">
+          <Grid
+            loading={loading}
+            data={{
+              header: [
+                { label: 'ID', key: 'id' },
+                { label: 'Name', key: 'name' },
+                { label: 'Note', key: 'note' },
+                {
+                  label: '# of Images',
+                  align: 'right',
+                  renderer: (row) => row.images.length
+                },
+                {
+                  label: 'Created At',
+                  align: 'right',
+                  renderer: (row) =>
+                    new Date(row.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit'
+                    })
+                },
+                {
+                  label: 'Status',
+                  align: 'right',
+                  renderer: (row) => <StatusTag status={row.status} />
+                }
+              ],
+              values: filterCases(),
+              actions: [
+                {
+                  label: 'Edit',
+                  action: handleAction(OPEN_MODE.EDIT),
+                  show: (row) => row.status !== CASE_STATUS.APPROVED
+                },
+                { label: 'View', action: handleAction(OPEN_MODE.VIEW) }
+              ]
+            }}
+          />
+        </div>
       </div>
 
       <Modal

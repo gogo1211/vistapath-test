@@ -13,7 +13,7 @@ export default function FilterPanel({ data, onChange }) {
   return (
     <div className="field is-horizontal">
       <div className="field-label is-small">
-        <label className="label">Filter</label>
+        <label className="label has-text-white">FILTER</label>
       </div>
       <div className="field-body">
         <div className="field">

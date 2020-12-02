@@ -1,11 +1,11 @@
-.gridTable {
+.grid-table {
   /* border: 1px solid #000; */
   width: 100%;
   border-spacing: 0;
   border-collapse: separate;
 }
 
-.gridTable thead tr th {
+.grid-table thead tr th {
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
@@ -14,7 +14,7 @@
   color: #aaa;
 }
 
-.gridTable tbody tr td {
+.grid-table tbody tr td {
   padding: 10px;
   font-size: 16px;
   font-weight: 400;
@@ -22,18 +22,22 @@
   vertical-align: middle;
 }
 
-.gridTable tbody tr:hover td {
+.grid-table tbody tr:hover td {
   background: #f1f1f1;
 }
 
-.gridActions button {
+.grid-actions button {
   margin: 0 5px;
 }
 
-.gridTable .center {
+.grid-table .left {
+  text-align: left;
+}
+
+.grid-table .center {
   text-align: center;
 }
 
-.gridTable .right {
+.grid-table .right {
   text-align: right;
 }

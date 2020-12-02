@@ -1,62 +1,19 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { InputField, TextField } from '../FormFields'
+import StatusTag from '../StatusTag'
 import { CASE_STATUS, OPEN_MODE } from '../../utils/constants'
 import './style.css'
 
-function InputField({ label, isValid = true, isViewOnly, ...props }) {
-  return (
-    <div className="field">
-      <label className="label">{label}</label>
-      <div className="control">
-        {isViewOnly ? (
-          props.value
-        ) : (
-          <input className={`input${isValid ? '' : ' is-danger'}`} {...props} />
-        )}
-      </div>
-      {!isValid && <p className="help is-danger">This field is invalid</p>}
-    </div>
-  )
-}
-
-InputField.propTypes = {
-  label: PropTypes.string,
-  isValid: PropTypes.bool
-}
-
-function TextField({ label, isValid = true, isViewOnly, ...props }) {
-  return (
-    <div className="field">
-      <label className="label">{label}</label>
-      <div className="control">
-        {isViewOnly ? (
-          props.value
-        ) : (
-          <textarea
-            className={`textarea${isValid ? '' : ' is-danger'}`}
-            {...props}
-          />
-        )}
-      </div>
-      {!isValid && <p className="help is-danger">This field is invalid</p>}
-    </div>
-  )
-}
-
-InputField.propTypes = {
-  label: PropTypes.string,
-  isValid: PropTypes.bool
-}
-
-export default function CaseForm({ data, onSubmit, onCancel }) {
-  const [caseData, setCaseData] = useState(data.case)
+export default function CaseForm({ mode, data, onSubmit, onCancel }) {
+  const [caseData, setCaseData] = useState(data)
 
   // new images & annotations
   const [newImages, setNewImages] = useState([])
 
   useEffect(() => {
-    setCaseData(data.case)
+    setCaseData(data)
     setNewImages([])
   }, [data])
 
@@ -68,7 +25,7 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
   }
 
   const handleSubmit = () => {
-    onSubmit(data.mode, caseData, newImages)
+    onSubmit(mode, caseData, newImages)
   }
 
   const handleChangeFile = (index, key, value) => {
@@ -96,7 +53,7 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
   }
 
   const renderSubmit = () => {
-    switch (data.mode) {
+    switch (mode) {
       case OPEN_MODE.ADD:
         return 'Create'
       case OPEN_MODE.EDIT:
@@ -113,59 +70,66 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
       <InputField
         type="text"
         label="Name"
-        value={caseData && caseData.name}
-        isViewOnly={data.mode === OPEN_MODE.VIEW}
+        value={caseData.name}
+        isViewOnly={mode === OPEN_MODE.VIEW}
         onChange={(e) => handleChange(e, 'name')}
       />
       <TextField
         label="General Note"
-        value={caseData && caseData.note}
-        isViewOnly={data.mode === OPEN_MODE.VIEW}
+        value={caseData.note}
+        isViewOnly={mode === OPEN_MODE.VIEW}
         onChange={(e) => handleChange(e, 'note')}
       />
+      {caseData.status && (
+        <div className="field">
+          <label className="label">Status</label>
+          <div className="control">
+            <StatusTag status={caseData.status} />
+          </div>
+        </div>
+      )}
       <div className="content">
         <ul>
-          {caseData &&
-            caseData.images.map(({ link, annotation }, index) => (
-              <li>
-                <div class="media">
-                  <figure class="media-left">
-                    <p class="image">
-                      <img
-                        src={`http://localhost:3100/images/view/${link}`}
-                        alt={link}
-                        style={{ width: 128 }}
-                      />
-                    </p>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <TextField
-                        type="text"
-                        value={annotation}
-                        isViewOnly={data.mode === OPEN_MODE.VIEW}
-                        onChange={(e) =>
-                          handleChangeFile(index, 'annotation', e.target.value)
-                        }
-                      />
-                    </div>
+          {caseData.images.map(({ link, annotation }, index) => (
+            <li key={index}>
+              <div className="media">
+                <figure className="media-left">
+                  <p className="image">
+                    <img
+                      src={`http://localhost:3100/images/view/${link}`}
+                      alt={link}
+                      style={{ width: 128 }}
+                    />
+                  </p>
+                </figure>
+                <div className="media-content">
+                  <div className="content">
+                    <TextField
+                      type="text"
+                      value={annotation}
+                      isViewOnly={mode === OPEN_MODE.VIEW}
+                      onChange={(e) =>
+                        handleChangeFile(index, 'annotation', e.target.value)
+                      }
+                    />
                   </div>
-                  {data.mode === OPEN_MODE.EDIT && (
-                    <div class="media-right">
-                      <button
-                        class="delete"
-                        onClick={handleRemoveFile(index)}
-                      ></button>
-                    </div>
-                  )}
                 </div>
-              </li>
-            ))}
+                {mode === OPEN_MODE.EDIT && (
+                  <div className="media-right">
+                    <button
+                      className="delete"
+                      onClick={handleRemoveFile(index)}
+                    ></button>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
           {newImages.map(({ file, annotation }, index) => (
-            <li>
-              <article class="media">
-                <figure class="media-left">
-                  <p class="image">
+            <li key={index}>
+              <article className="media">
+                <figure className="media-left">
+                  <p className="image">
                     <img
                       src={URL.createObjectURL(file)}
                       alt={file.name}
@@ -173,8 +137,8 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
                     />
                   </p>
                 </figure>
-                <div class="media-content">
-                  <div class="content">
+                <div className="media-content">
+                  <div className="content">
                     <TextField
                       type="text"
                       value={annotation}
@@ -184,9 +148,9 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
                     />
                   </div>
                 </div>
-                <div class="media-right">
+                <div className="media-right">
                   <button
-                    class="delete"
+                    className="delete"
                     onClick={handleRemoveNewFile(index)}
                   ></button>
                 </div>
@@ -196,8 +160,8 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
         </ul>
       </div>
       <div className="field is-grouped is-grouped-centered">
-        {data.mode !== OPEN_MODE.VIEW && (
-          <p className="control">
+        {mode !== OPEN_MODE.VIEW && (
+          <div className="control">
             <label htmlFor="add-files">
               <div className="button is-primary">Add Files</div>
             </label>
@@ -220,9 +184,9 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
                 }
               }}
             />
-          </p>
+          </div>
         )}
-        {caseData && caseData.status !== CASE_STATUS.APPROVED && (
+        {caseData.status !== CASE_STATUS.APPROVED && (
           <p className="control">
             <button className="button is-primary" onClick={handleSubmit}>
               {renderSubmit()}
@@ -240,8 +204,19 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
 }
 
 CaseForm.propTypes = {
-  item: PropTypes.shape({
+  mode: PropTypes.oneOf(['add', 'edit', 'view']),
+  data: PropTypes.shape({
     name: PropTypes.string,
-    note: PropTypes.string
+    note: PropTypes.string,
+    images: PropTypes.array
   })
+}
+
+CaseForm.defaultProps = {
+  mode: 'add',
+  data: {
+    name: '',
+    note: '',
+    images: []
+  }
 }

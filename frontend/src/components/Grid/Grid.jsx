@@ -16,18 +16,19 @@ export default function Grid({
     }
     return values.map((row, index) => (
       <tr key={index}>
-        {header.map(({ key, type, renderer }) => (
-          <td key={key} className={type === 'number' ? 'right' : 'center'}>
+        {header.map(({ key, align, renderer }, index) => (
+          <td key={index} className={align || ''}>
             {renderer ? renderer(row) : row[key]}
           </td>
         ))}
         {!!actions.length && (
-          <td className="gridActions">
+          <td className="grid-actions">
             <div className="buttons">
               {actions
                 .filter(({ show }) => !show || (show && show(row)))
                 .map(({ label, action }, index) => (
                   <button
+                    key={index}
                     className="button is-primary is-small is-outlined is-rounded"
                     onClick={() => action(row)}
                   >
@@ -41,11 +42,11 @@ export default function Grid({
     ))
   }
   return (
-    <table className="gridTable">
+    <table className="grid-table">
       <thead>
         <tr>
-          {header.map(({ label, type }) => (
-            <th key={label} className={type === 'number' ? 'right' : 'center'}>
+          {header.map(({ label, align }) => (
+            <th key={label} className={align || ''}>
               {label}
             </th>
           ))}

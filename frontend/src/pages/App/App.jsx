@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 
 import Grid from '../../components/Grid'
 import Modal from '../../components/Modal'
 import CaseForm from '../../components/CaseForm'
 import FilterPanel from '../../components/FilterPanel'
+import StatusTag from '../../components/StatusTag'
+
 import { createCase, fetchCases, updateCase } from '../../utils/api'
-import {
-  CASE_STATUS,
-  CASE_STATUS_COLOR,
-  OPEN_MODE
-} from '../../utils/constants'
+import { CASE_STATUS, OPEN_MODE } from '../../utils/constants'
 import './style.css'
 
 export default function App() {
+  const [loading, setLoading] = useState(false)
   const [cases, setCases] = useState([])
   const [filter, setFilter] = useState({
     name: '',
@@ -21,7 +21,16 @@ export default function App() {
   const [openForm, setOpenForm] = useState({})
 
   useEffect(() => {
-    fetchCases().then((res) => setCases(res))
+    setLoading(true)
+    fetchCases()
+      .then((res) => {
+        setCases(res)
+        toast.success(`Cases are loaded!`)
+      })
+      .catch(() => {
+        toast.error('Case loading is failed!')
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   const handleAddNewCase = (e) => {
@@ -46,7 +55,11 @@ export default function App() {
     if (mode === OPEN_MODE.ADD) {
       createCase(data, newFiles)
         .then((res) => {
+          toast.success(`New case [${res.name}] is created!`)
           setCases([...cases, res])
+        })
+        .catch(() => {
+          toast.error('Creating a new case is failed!')
         })
         .finally(() => {
           setOpenForm(false)
@@ -58,6 +71,10 @@ export default function App() {
           const index = cases.findIndex((item) => item.id === res.id)
           newCases.splice(index, 1, res)
           setCases(newCases)
+          toast.success(`Case [${res.name}] is updated!`)
+        })
+        .catch(() => {
+          toast.error('Updating a case is failed!')
         })
         .finally(() => {
           setOpenForm(false)
@@ -80,7 +97,7 @@ export default function App() {
   return (
     <div className="app">
       <h1 className="title">Cases</h1>
-      <div className="header">
+      <div className="case-action">
         <FilterPanel data={filter} onChange={setFilter} />
         <button
           className="button is-primary is-small"
@@ -92,30 +109,31 @@ export default function App() {
 
       <div className="box">
         <Grid
+          loading={loading}
           data={{
             header: [
               { label: 'ID', key: 'id' },
               { label: 'Name', key: 'name' },
               { label: 'Note', key: 'note' },
               {
-                label: 'Number of Images',
-                type: 'number',
+                label: '# of Images',
+                align: 'right',
                 renderer: (row) => row.images.length
               },
               {
+                label: 'Created At',
+                align: 'right',
+                renderer: (row) =>
+                  new Date(row.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                  })
+              },
+              {
                 label: 'Status',
-                type: 'number',
-                renderer: (row) => {
-                  return (
-                    <span
-                      className={`tag is-capitalized ${
-                        CASE_STATUS_COLOR[row.status]
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  )
-                }
+                align: 'right',
+                renderer: (row) => <StatusTag status={row.status} />
               }
             ],
             values: filterCases(),
@@ -137,7 +155,8 @@ export default function App() {
         onClose={() => setOpenForm({})}
       >
         <CaseForm
-          data={openForm}
+          mode={openForm.mode}
+          data={openForm.case}
           onSubmit={handleSubmit}
           onCancel={() => setOpenForm({})}
         />

@@ -1,5 +1,5 @@
 const Router = require('express-promise-router')
-const path = require('path');
+const path = require('path')
 
 const router = new Router()
 

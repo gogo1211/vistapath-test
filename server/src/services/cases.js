@@ -8,6 +8,7 @@ class CaseService {
       include: ['images'],
       order: [['createdAt', 'ASC']]
     })
+    await this.sleep(2000)
     return cases
   }
 
@@ -19,6 +20,7 @@ class CaseService {
   async create(data) {
     const { name, note, files, annotations } = data
     const item = await Case.create({ name, note })
+
     await Image.bulkCreate(
       files.map((file, index) => ({
         case: item.id,
@@ -26,20 +28,23 @@ class CaseService {
         annotation: annotations[index]
       }))
     )
-    return this.analyze(item.id)
+
+    // analyze case
+    await this.analyze(item.id)
+
+    return this.getById(item.id)
   }
 
   async update(id, data) {
     const { name, note, images, files, annotations } = data
-    console.log(data)
     const item = await Case.findByPk(id)
+
     if (item.status === 'approved') {
       throw new Error('Can not update this case')
     }
+
     await Image.destroy({ where: { case: id } })
-    if (images) {
-      await Image.bulkCreate(images)
-    }
+    await Image.bulkCreate(images)
     await Image.bulkCreate(
       files.map((file, index) => ({
         case: item.id,
@@ -47,8 +52,12 @@ class CaseService {
         annotation: annotations[index]
       }))
     )
-    const updatedItem = await item.update({ name, note })
-    return this.analyze(updatedItem.id)
+    await item.update({ name, note })
+
+    // analyze case
+    await this.analyze(item.id)
+
+    return this.getById(item.id)
   }
 
   async removeById(id) {
@@ -59,14 +68,17 @@ class CaseService {
     const item = await Case.findByPk(id, { include: 'images' })
 
     // review case and update status
-    const status = 'rejected' // this.random() ? 'rejected' : 'approved'
+    const status = this.random() ? 'rejected' : 'approved'
 
-    const updatedItem = await item.update({ status })
-    return updatedItem
+    await item.update({ status })
   }
 
   random() {
     return Math.floor(Math.random() * 10) % 3
+  }
+
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }
 

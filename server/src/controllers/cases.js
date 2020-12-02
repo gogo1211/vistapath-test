@@ -53,12 +53,14 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', upload.array('images', 10), async (req, res) => {
   const { data, annotations } = req.body
+  const { name, note } = JSON.parse(data)
   if (!name) {
     res.status(400).json({ error: 'Bad Request: Name is required' })
     return
   }
   const item = await CaseServiceInstance.create({
-    ...JSON.parse(data),
+    name,
+    note,
     files: req.files.map(({ filename }) => filename),
     annotations
   })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { OPEN_MODE } from '../../utils/constants'
+import { CASE_STATUS, OPEN_MODE } from '../../utils/constants'
 
 function InputField({ label, isValid = true, isViewOnly, ...props }) {
   return (
@@ -63,7 +63,20 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
   }
 
   const handleSubmit = () => {
-    onSubmit(caseData)
+    onSubmit(data.mode, caseData)
+  }
+
+  const renderSubmit = () => {
+    switch (data.mode) {
+      case OPEN_MODE.ADD:
+        return 'Create'
+      case OPEN_MODE.EDIT:
+        return 'Resubmit'
+      case OPEN_MODE.VIEW:
+        return 'Edit'
+      default:
+        return 'Submit'
+    }
   }
 
   return (
@@ -82,11 +95,13 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
         onChange={(e) => handleChange(e, 'note')}
       />
       <div className="field is-grouped is-grouped-centered">
-        <p className="control">
-          <button className="button is-primary" onClick={handleSubmit}>
-            Submit
-          </button>
-        </p>
+        {caseData && caseData.status !== CASE_STATUS.APPROVED && (
+          <p className="control">
+            <button className="button is-primary" onClick={handleSubmit}>
+              {renderSubmit()}
+            </button>
+          </p>
+        )}
         <p className="control">
           <button className="button is-light" onClick={onCancel}>
             Cancel

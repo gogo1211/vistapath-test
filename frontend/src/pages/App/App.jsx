@@ -3,8 +3,12 @@ import { useEffect, useState } from 'react'
 import Grid from '../../components/Grid'
 import Modal from '../../components/Modal'
 import CaseForm from '../../components/CaseForm'
-import { createCase, fetchCases } from '../../utils/api'
-import { CASE_STATUS, OPEN_MODE } from '../../utils/constants'
+import { createCase, fetchCases, updateCase } from '../../utils/api'
+import {
+  CASE_STATUS,
+  CASE_STATUS_COLOR,
+  OPEN_MODE
+} from '../../utils/constants'
 import './style.css'
 
 export default function App() {
@@ -33,7 +37,8 @@ export default function App() {
     })
   }
 
-  const handleSubmit = (data) => {
+  const handleSubmit = (mode, data) => {
+    if (mode === OPEN_MODE.ADD) {
     createCase(data)
       .then((res) => {
         setCases([...cases, res])
@@ -41,6 +46,23 @@ export default function App() {
       .finally(() => {
         setOpenForm(false)
       })
+    } else if (mode === OPEN_MODE.EDIT && data.id) {
+      updateCase(data.id, data)
+        .then((res) => {
+          const newCases = [...cases]
+          const index = cases.findIndex((item) => item.id === res.id)
+          newCases.splice(index, 1, res)
+          setCases(newCases)
+        })
+        .finally(() => {
+          setOpenForm(false)
+        })
+    } else if (mode === OPEN_MODE.VIEW) {
+      setOpenForm({
+        ...openForm,
+        mode: OPEN_MODE.EDIT
+      })
+    }
   }
 
   return (
@@ -68,9 +90,17 @@ export default function App() {
             {
               label: 'Status',
               type: 'number',
-              renderer: (row) => (
-                <span className="tag is-info is-capitalized">{row.status}</span>
+              renderer: (row) => {
+                return (
+                  <span
+                    className={`tag is-capitalized ${
+                      CASE_STATUS_COLOR[row.status]
+                    }`}
+                  >
+                    {row.status}
+                  </span>
               )
+            }
             }
           ],
           values: cases,

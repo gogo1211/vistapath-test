@@ -23,18 +23,16 @@ export default function Grid({
         ))}
         {!!actions.length && (
           <td className="gridActions">
-            <div className="field is-grouped is-grouped-multiline">
+            <div className="buttons">
               {actions
                 .filter(({ show }) => !show || (show && show(row)))
                 .map(({ label, action }, index) => (
-                  <p key={index} className="control">
-                    <button
-                      className="button is-primary is-small"
-                      onClick={() => action(row)}
-                    >
-                      {label}
-                    </button>
-                  </p>
+                  <button
+                    className="button is-primary is-small is-outlined is-rounded"
+                    onClick={() => action(row)}
+                  >
+                    {label}
+                  </button>
                 ))}
             </div>
           </td>

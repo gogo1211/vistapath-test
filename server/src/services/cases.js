@@ -12,17 +12,40 @@ class CaseService {
   }
 
   async getById(id) {
-    const row = await Case.findByPk(id, { include: 'images' })
-    return row
+    const item = await Case.findByPk(id, { include: 'images' })
+    return item
   }
 
   async create(data) {
-    const newCase = await Case.create(data)
-    return newCase
+    const item = await Case.create(data)
+    return this.analyze(item.id)
+  }
+
+  async update(id, data) {
+    const item = await Case.findByPk(id)
+    if (item.status === 'approved') {
+      throw new Error('Can not update this case')
+    }
+    const updatedItem = await item.update(data)
+    return this.analyze(updatedItem.id)
   }
 
   async removeById(id) {
     await Case.destroy({ where: { id } })
+  }
+
+  async analyze(id) {
+    const item = await Case.findByPk(id, { include: 'images' })
+
+    // review case and update status
+    const status = this.random() ? 'rejected' : 'approved'
+
+    const updatedItem = await item.update({ status })
+    return updatedItem
+  }
+
+  random() {
+    return Math.floor(Math.random() * 10) % 3
   }
 }
 

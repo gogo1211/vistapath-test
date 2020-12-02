@@ -11,10 +11,10 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  const row = await CaseServiceInstance.getById(req.params.id)
+  const item = await CaseServiceInstance.getById(req.params.id)
 
-  if (row) {
-    res.status(200).json(row)
+  if (item) {
+    res.status(200).json(item)
   } else {
     res.status(500).json({ error: 'Internal Server Error' })
   }
@@ -26,11 +26,16 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: 'Bad Request: Name is required' })
     return
   }
-  const newCase = await CaseServiceInstance.create({
+  const item = await CaseServiceInstance.create({
     name,
     note
   })
-  res.status(200).json(newCase)
+  res.status(200).json(item)
+})
+
+router.put('/:id', async (req, res) => {
+  const item = await CaseServiceInstance.update(req.params.id, req.body)
+  res.status(200).json(item)
 })
 
 router.delete('/:id', async (req, res) => {

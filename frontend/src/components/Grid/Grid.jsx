@@ -1,8 +1,11 @@
 import Loader from '../Loader'
 import PropTypes from 'prop-types'
-import './Grid.css'
+import './style.css'
 
-function Grid({ loading, data: { header = [], values = [], actions = [] } }) {
+export default function Grid({
+  loading,
+  data: { header = [], values = [], actions = [] }
+}) {
   const renderValues = () => {
     if (!values.length) {
       return (
@@ -13,16 +16,16 @@ function Grid({ loading, data: { header = [], values = [], actions = [] } }) {
     }
     return values.map((row, index) => (
       <tr key={index}>
-        {header.map(({ label, type }) => (
-          <td key={label} className={type === 'number' ? 'right' : 'center'}>
-            {row[label]}
+        {header.map(({ key, type, renderer }) => (
+          <td key={key} className={type === 'number' ? 'right' : 'center'}>
+            {renderer ? renderer(row) : row[key]}
           </td>
         ))}
         {!!actions.length && (
           <td className="gridActions">
             <div className="field is-grouped is-grouped-multiline">
               {actions
-                .filter(({ show }) => show(row))
+                .filter(({ show }) => !show || (show && show(row)))
                 .map(({ label, action }, index) => (
                   <p key={index} className="control">
                     <button
@@ -74,5 +77,3 @@ Grid.propTypes = {
     actions: PropTypes.array
   })
 }
-
-export default Grid

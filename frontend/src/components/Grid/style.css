@@ -13,11 +13,13 @@
   padding: 5px 10px;
   color: #aaa;
 }
+
 .gridTable tbody tr td {
   padding: 10px;
   font-size: 16px;
   font-weight: 400;
   border-bottom: 1px solid #333;
+  vertical-align: middle;
 }
 
 .gridTable tbody tr:hover td {

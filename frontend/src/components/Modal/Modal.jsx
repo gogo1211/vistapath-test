@@ -6,7 +6,7 @@ export default function Modal({ title, children, open, onClose }) {
       <div className="modal-background" onClick={onClose}></div>
       <div className="modal-card">
         <header className="modal-card-head">
-          <p className="modal-card-title">{title}</p>
+          <p className="modal-card-title is-capitalized">{title}</p>
           <button
             className="delete"
             aria-label="close"

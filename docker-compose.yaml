@@ -20,12 +20,7 @@ services:
     depends_on:
       - postgres
     environment:
-      USERNAME: user
-      PASSWORD: pass
-      DATABASE: db
-      HOST: postgres
-      PORT: 5432
-      NODE_ENV: development
+      DATABASE_URL: postgres://user:pass@postgres:5432/db
       PORT: 3100
     ports:
       - "3100:3100"

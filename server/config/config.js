@@ -1,26 +1,30 @@
+var parse = require('pg-connection-string').parse;
+ 
+var config = parse(process.env.DATABASE_URL)
+
 module.exports = {
   development: {
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-    host: process.env.HOST,
-    port: process.env.PORT,
+    username: config.user,
+    password: config.password,
+    database: config.database,
+    host: config.host,
+    port: config.port,
     dialect: 'postgres'
   },
   test: {
-    username: process.env.CI_USERNAME,
-    password: process.env.CI_PASSWORD,
-    database: process.env.CI_DATABASE,
-    host: process.env.CI_HOST,
-    port: process.env.CI_PORT,
+    username: config.user,
+    password: config.password,
+    database: config.database,
+    host: config.host,
+    port: config.port,
     dialect: 'postgres'
   },
   production: {
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-    host: process.env.HOST,
-    port: process.env.PORT,
+    username: config.user,
+    password: config.password,
+    database: config.database,
+    host: config.host,
+    port: config.port,
     dialect: 'postgres'
   }
 }

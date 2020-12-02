@@ -1,9 +1,36 @@
 const Router = require('express-promise-router')
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 const CaseService = require('../services/cases')
 
 const router = new Router()
 const CaseServiceInstance = new CaseService()
+
+const DIR = './public/';
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, DIR);
+  },
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.toLowerCase().split(' ').join('-');
+    console.log(fileName)
+    cb(null, uuidv4() + '-' + fileName)
+  }
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+    }
+  }
+});
 
 router.get('/', async (req, res) => {
   const cases = await CaseServiceInstance.getAll()
@@ -20,15 +47,18 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.post('/', async (req, res) => {
-  const { name, note } = req.body
+router.post('/', upload.array('images', 10), async (req, res) => {
+  const { name, note, annotations } = req.body
+  console.log(req.body)
   if (!name) {
     res.status(400).json({ error: 'Bad Request: Name is required' })
     return
   }
   const item = await CaseServiceInstance.create({
     name,
-    note
+    note,
+    files: req.files.map(({ filename }) => filename),
+    annotations
   })
   res.status(200).json(item)
 })

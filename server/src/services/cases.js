@@ -17,7 +17,15 @@ class CaseService {
   }
 
   async create(data) {
-    const item = await Case.create(data)
+    const { name, note, files, annotations } = data
+    const item = await Case.create({ name, note })
+    await Image.bulkCreate(
+      files.map((file, index) => ({
+        case: item.id,
+        link: file,
+        annotation: annotations[index]
+      }))
+    )
     return this.analyze(item.id)
   }
 

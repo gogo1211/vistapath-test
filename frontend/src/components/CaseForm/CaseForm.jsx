@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { CASE_STATUS, OPEN_MODE } from '../../utils/constants'
+import './style.css'
 
 function InputField({ label, isValid = true, isViewOnly, ...props }) {
   return (
@@ -51,8 +52,12 @@ InputField.propTypes = {
 export default function CaseForm({ data, onSubmit, onCancel }) {
   const [caseData, setCaseData] = useState(data.case)
 
+  // new images & annotations
+  const [newImages, setNewImages] = useState([])
+
   useEffect(() => {
     setCaseData(data.case)
+    setNewImages([])
   }, [data])
 
   const handleChange = (e, type) => {
@@ -63,7 +68,16 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
   }
 
   const handleSubmit = () => {
-    onSubmit(data.mode, caseData)
+    onSubmit(data.mode, {
+      ...caseData,
+      files: newImages
+    })
+  }
+
+  const handleChangeNewFile = (index, key, value) => {
+    const temp = [...newImages]
+    temp.splice(index, 1, { ...newImages[index], [key]: value })
+    setNewImages(temp)
   }
 
   const renderSubmit = () => {
@@ -94,7 +108,79 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
         isViewOnly={data.mode === 'view'}
         onChange={(e) => handleChange(e, 'note')}
       />
+      <div className="content">
+        <ul>
+          {caseData &&
+            caseData.images.map(({ link, annotation }) => (
+              <li>
+                <article class="media">
+                  <figure class="media-left">
+                    <p class="image">
+                      <img
+                        src={`http://localhost:3100/images/view/${link}`}
+                        alt={link}
+                        style={{ width: 128 }}
+                      />
+                    </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="content">
+                      <TextField type="text" value={annotation} />
+                    </div>
+                  </div>
+                  <div class="media-right">
+                    <button class="delete"></button>
+                  </div>
+                </article>
+              </li>
+            ))}
+          {newImages.map(({ file, annotation }, index) => (
+            <li>
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      style={{ width: 128 }}
+                    />
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <TextField
+                      type="text"
+                      value={annotation}
+                      onChange={(e) =>
+                        handleChangeNewFile(index, 'annotation', e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+                <div class="media-right">
+                  <button class="delete"></button>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div className="field is-grouped is-grouped-centered">
+        <p className="control">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              if (e.target.files) {
+                // setAvatar(URL.createObjectURL(e.target.files[0]));
+                setNewImages(
+                  [...e.target.files].map((file) => ({ file, annotation: '' }))
+                )
+              }
+            }}
+          />
+        </p>
         {caseData && caseData.status !== CASE_STATUS.APPROVED && (
           <p className="control">
             <button className="button is-primary" onClick={handleSubmit}>

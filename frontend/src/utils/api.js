@@ -8,7 +8,14 @@ export async function fetchCases() {
 }
 
 export async function createCase(data) {
-  const response = await axios.post(`${BASE_URL}/cases`, data)
+  const formData = new FormData()
+  formData.append('name', data.name)
+  formData.append('note', data.note)
+  data.files.forEach(({ file, annotation }) => {
+    formData.append('images', file)
+    formData.append('annotations', annotation)
+  })
+  const response = await axios.post(`${BASE_URL}/cases`, formData)
   return response.data
 }
 

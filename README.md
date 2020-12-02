@@ -40,3 +40,11 @@ _The React SPA is running at localhost:3000_
 While docker-compose up is running, in a new terminal run `docker-compose run app bash` to start a bash shell inside the app container. From there, you can run the following migration commands:
 - npm run migrate:up will run the migrations.
 - npm run migrate:down will roll back the migrations.
+
+## TODOs
+- Mock user authentication
+- Authenticated routing
+- Update existing image item
+- Performance test
+- Use cloud storage for image upload (e.g. AWS S3)
+- Unit testing

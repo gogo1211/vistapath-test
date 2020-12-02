@@ -30,11 +30,24 @@ class CaseService {
   }
 
   async update(id, data) {
+    const { name, note, images, files, annotations } = data
+    console.log(data)
     const item = await Case.findByPk(id)
     if (item.status === 'approved') {
       throw new Error('Can not update this case')
     }
-    const updatedItem = await item.update(data)
+    await Image.destroy({ where: { case: id } })
+    if (images) {
+      await Image.bulkCreate(images)
+    }
+    await Image.bulkCreate(
+      files.map((file, index) => ({
+        case: item.id,
+        link: file,
+        annotation: annotations[index]
+      }))
+    )
+    const updatedItem = await item.update({ name, note })
     return this.analyze(updatedItem.id)
   }
 
@@ -46,7 +59,7 @@ class CaseService {
     const item = await Case.findByPk(id, { include: 'images' })
 
     // review case and update status
-    const status = this.random() ? 'rejected' : 'approved'
+    const status = 'rejected' // this.random() ? 'rejected' : 'approved'
 
     const updatedItem = await item.update({ status })
     return updatedItem

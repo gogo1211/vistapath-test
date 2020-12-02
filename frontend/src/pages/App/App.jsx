@@ -42,9 +42,9 @@ export default function App() {
     })
   }
 
-  const handleSubmit = (mode, data) => {
+  const handleSubmit = (mode, data, newFiles) => {
     if (mode === OPEN_MODE.ADD) {
-      createCase(data)
+      createCase(data, newFiles)
         .then((res) => {
           setCases([...cases, res])
         })
@@ -52,7 +52,7 @@ export default function App() {
           setOpenForm(false)
         })
     } else if (mode === OPEN_MODE.EDIT && data.id) {
-      updateCase(data.id, data)
+      updateCase(data.id, data, newFiles)
         .then((res) => {
           const newCases = [...cases]
           const index = cases.findIndex((item) => item.id === res.id)

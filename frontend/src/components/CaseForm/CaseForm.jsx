@@ -68,15 +68,30 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
   }
 
   const handleSubmit = () => {
-    onSubmit(data.mode, {
-      ...caseData,
-      files: newImages
-    })
+    onSubmit(data.mode, caseData, newImages)
+  }
+
+  const handleChangeFile = (index, key, value) => {
+    const temp = [...caseData.images]
+    temp.splice(index, 1, { ...temp[index], [key]: value })
+    setCaseData({ ...caseData, images: temp })
+  }
+
+  const handleRemoveFile = (index) => (e) => {
+    const temp = [...caseData.images]
+    temp.splice(index, 1)
+    setCaseData({ ...caseData, images: temp })
   }
 
   const handleChangeNewFile = (index, key, value) => {
     const temp = [...newImages]
     temp.splice(index, 1, { ...newImages[index], [key]: value })
+    setNewImages(temp)
+  }
+
+  const handleRemoveNewFile = (index) => (e) => {
+    const temp = [...newImages]
+    temp.splice(index, 1)
     setNewImages(temp)
   }
 
@@ -105,15 +120,15 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
       <TextField
         label="General Note"
         value={caseData && caseData.note}
-        isViewOnly={data.mode === 'view'}
+        isViewOnly={data.mode === OPEN_MODE.VIEW}
         onChange={(e) => handleChange(e, 'note')}
       />
       <div className="content">
         <ul>
           {caseData &&
-            caseData.images.map(({ link, annotation }) => (
+            caseData.images.map(({ link, annotation }, index) => (
               <li>
-                <article class="media">
+                <div class="media">
                   <figure class="media-left">
                     <p class="image">
                       <img
@@ -125,13 +140,25 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
                   </figure>
                   <div class="media-content">
                     <div class="content">
-                      <TextField type="text" value={annotation} />
+                      <TextField
+                        type="text"
+                        value={annotation}
+                        isViewOnly={data.mode === OPEN_MODE.VIEW}
+                        onChange={(e) =>
+                          handleChangeFile(index, 'annotation', e.target.value)
+                        }
+                      />
                     </div>
                   </div>
-                  <div class="media-right">
-                    <button class="delete"></button>
-                  </div>
-                </article>
+                  {data.mode === OPEN_MODE.EDIT && (
+                    <div class="media-right">
+                      <button
+                        class="delete"
+                        onClick={handleRemoveFile(index)}
+                      ></button>
+                    </div>
+                  )}
+                </div>
               </li>
             ))}
           {newImages.map(({ file, annotation }, index) => (
@@ -158,7 +185,10 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
                   </div>
                 </div>
                 <div class="media-right">
-                  <button class="delete"></button>
+                  <button
+                    class="delete"
+                    onClick={handleRemoveNewFile(index)}
+                  ></button>
                 </div>
               </article>
             </li>
@@ -166,21 +196,32 @@ export default function CaseForm({ data, onSubmit, onCancel }) {
         </ul>
       </div>
       <div className="field is-grouped is-grouped-centered">
-        <p className="control">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              if (e.target.files) {
-                // setAvatar(URL.createObjectURL(e.target.files[0]));
-                setNewImages(
-                  [...e.target.files].map((file) => ({ file, annotation: '' }))
-                )
-              }
-            }}
-          />
-        </p>
+        {data.mode !== OPEN_MODE.VIEW && (
+          <p className="control">
+            <label htmlFor="add-files">
+              <div className="button is-primary">Add Files</div>
+            </label>
+            <input
+              id="add-files"
+              name="add-files"
+              type="file"
+              accept="image/*"
+              multiple
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                if (e.target.files) {
+                  setNewImages([
+                    ...newImages,
+                    ...[...e.target.files].map((file) => ({
+                      file,
+                      annotation: ''
+                    }))
+                  ])
+                }
+              }}
+            />
+          </p>
+        )}
         {caseData && caseData.status !== CASE_STATUS.APPROVED && (
           <p className="control">
             <button className="button is-primary" onClick={handleSubmit}>

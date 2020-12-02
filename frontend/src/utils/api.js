@@ -7,11 +7,10 @@ export async function fetchCases() {
   return response.data
 }
 
-export async function createCase(data) {
+export async function createCase(data, files) {
   const formData = new FormData()
-  formData.append('name', data.name)
-  formData.append('note', data.note)
-  data.files.forEach(({ file, annotation }) => {
+  formData.append('data', JSON.stringify(data))
+  files.forEach(({ file, annotation }) => {
     formData.append('images', file)
     formData.append('annotations', annotation)
   })
@@ -19,7 +18,13 @@ export async function createCase(data) {
   return response.data
 }
 
-export async function updateCase(id, data) {
-  const response = await axios.put(`${BASE_URL}/cases/${id}`, data)
+export async function updateCase(id, data, files) {
+  const formData = new FormData()
+  formData.append('data', JSON.stringify(data))
+  files.forEach(({ file, annotation }) => {
+    formData.append('new-images', file)
+    formData.append('annotations', annotation)
+  })
+  const response = await axios.put(`${BASE_URL}/cases/${id}`, formData)
   return response.data
 }

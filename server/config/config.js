@@ -1,18 +1,26 @@
 module.exports = {
   development: {
-    username: 'postgres',
-    password: 'LM2450252',
-    database: 'vistapath',
-    host: 'localhost',
-    port: 5432,
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+    host: process.env.HOST,
+    port: process.env.PORT,
     dialect: 'postgres'
   },
   test: {
-    connectionString: '',
+    username: process.env.CI_USERNAME,
+    password: process.env.CI_PASSWORD,
+    database: process.env.CI_DATABASE,
+    host: process.env.CI_HOST,
+    port: process.env.CI_PORT,
     dialect: 'postgres'
   },
   production: {
-    connectionString: process.env.DATABASE_URL,
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE,
+    host: process.env.HOST,
+    port: process.env.PORT,
     dialect: 'postgres'
   }
 }
